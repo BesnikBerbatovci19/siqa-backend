@@ -1,6 +1,16 @@
 const SubCategoryModel = require("../model/subcategory.model");
 const { generateSlugSubCategoryByName } = require("../utils/generateSlug");
-exports.getSubCategory = async function (req, res) {};
+exports.getSubCategory = async function (req, res) {
+  try {
+    const result = await SubCategoryModel.getSubCategory();
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error fetching subcategory", error });
+  }
+};
 
 exports.getSubcategoryById = async function (req, res) {
   const { id } = req.params;

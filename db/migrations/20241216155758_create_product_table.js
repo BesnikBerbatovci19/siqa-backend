@@ -25,7 +25,7 @@ exports.up = function (knex) {
     table.integer("warranty").nullable();
     table.integer("discount").nullable();
     table.text("path").nullable();
-    table.timestamp(true, true);
+    table.timestamps(true, true);
   });
 };
 

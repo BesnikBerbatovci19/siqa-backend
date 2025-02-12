@@ -1,5 +1,6 @@
 const { executeQuery } = require("../config/database");
 const { getSQLQuery } = require("../lib/getSQLQuery");
+const { toNullIfEmpty } = require("../utils/convertTypeData");
 
 const getAllProduct = async () => {
   const result = await executeQuery({
@@ -15,7 +16,7 @@ const getProductById = async (id) => {
     params: [id],
   });
   if (!result?.status) throw result;
-  return result?.data;
+  return result?.data[0];
 };
 
 const createProduct = async (
@@ -32,7 +33,7 @@ const createProduct = async (
   description,
   price,
   purchasePrice,
-  sku,
+  SKU,
   barcode,
   status,
   instock,
@@ -54,15 +55,15 @@ const createProduct = async (
       manufacturerId,
       name,
       description,
-      price,
+      toNullIfEmpty(price),
       purchasePrice,
-      sku,
+      SKU,
       barcode,
       status,
-      instock,
-      warranty,
-      discount,
-      JSON.stringify(path),
+      toNullIfEmpty(instock),
+      toNullIfEmpty(warranty),
+      toNullIfEmpty(discount),
+      path,
     ],
   });
   if (!result?.status) throw result;
@@ -78,9 +79,25 @@ const deleteProduct = async (id) => {
   return result?.data;
 };
 
+const deletePhoto = async (id, idPhoto) => {
+  const result = await executeQuery({
+    query: getSQLQuery([1014]),
+    params: [id],
+  });
+  let photo = JSON.parse(result.data[0].path || []).filter(
+    (item) => item.id != idPhoto
+  );
+  const resultUpdate = await executeQuery({
+    query: getSQLQuery([3004]),
+    params: [JSON.stringify(photo), id],
+  });
+  if (!resultUpdate?.status) throw result;
+  return resultUpdate?.data;
+};
 module.exports = {
   getAllProduct,
   getProductById,
   createProduct,
   deleteProduct,
+  deletePhoto,
 };

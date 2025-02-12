@@ -1,7 +1,7 @@
 const { executeQuery } = require("../config/database");
 const { getSQLQuery } = require("../lib/getSQLQuery");
 
-const getAllItemSubcategory = async (id) => {
+const getAllItemSubcategoryById = async (id) => {
   const result = await executeQuery({
     query: getSQLQuery([1010]),
     params: [id],
@@ -34,7 +34,15 @@ const deleteItemSubcategory = async (id) => {
   return result.data;
 };
 
+const getAllItemSubcategory = async () => {
+  const result = await executeQuery({
+    query: getSQLQuery([1015]),
+  });
+  if (!result?.status) throw result;
+  return result.data;
+};
 module.exports = {
+  getAllItemSubcategoryById,
   getAllItemSubcategory,
   createItemSubCategory,
   deleteItemSubcategory,

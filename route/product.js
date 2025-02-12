@@ -3,14 +3,45 @@ const router = express.Router();
 
 const ProductController = require("../controller/product.controller");
 const uploadMiddleware = require("../middleware/upload/uploadMiddleware");
-
-router.get("/getProduct", ProductController.getProduct);
-router.get("/getProduct/:id", ProductController.getProductById);
+const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
+router.get(
+  "/",
+  authMiddleware,
+  checkRole("admin"),
+  ProductController.getProduct
+);
+router.get(
+  "/:id",
+  authMiddleware,
+  checkRole("admin"),
+  ProductController.getProductById
+);
 router.post(
-  "/createProduct",
+  "/",
+  authMiddleware,
+  checkRole("admin"),
   uploadMiddleware,
   ProductController.createProduct
 );
-router.put("/updateProduct/:id", ProductController.updateProduct);
-router.delete("/deleteProduct/:id", ProductController.deleteProduct);
+router.put(
+  "/:id",
+  authMiddleware,
+  checkRole("admin"),
+  uploadMiddleware,
+  ProductController.updateProduct
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  checkRole("admin"),
+  ProductController.deleteProduct
+);
+
+router.delete(
+  "/deletePhotoProduct/:id/:idPhoto",
+  authMiddleware,
+  checkRole("admin", "user"),
+  ProductController.deletePhoto
+);
+
 module.exports = router;

@@ -32,14 +32,14 @@ app.use(function (req, res, next) {
 require("./config/passport");
 app.use(passport.initialize());
 
-// Serve Static Files (e.g., Public Assets)
-app.use(express.static(path.join(__dirname, "public")));
-
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal Server Error" });
 });
+
+// Serve Static Files (e.g., Public Assets)
+app.use(express.static(path.join(__dirname)));
 
 // Routes
 app.use("/api/user", userRoute);
