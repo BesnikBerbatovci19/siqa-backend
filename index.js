@@ -13,6 +13,9 @@ const itemsubcategoryRoute = require("./route/itemSubcategory");
 const authRoute = require("./route/auth");
 const manufacterRoute = require("./route/manufacter");
 const productRoute = require("./route/product");
+const supplaierRoute = require("./route/supplaierRoute");
+const countryRoute = require("./route/countryRoute");
+const cityRoute = require("./route/cityRoute");
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
@@ -49,6 +52,9 @@ app.use("/api/itemsubcategory", itemsubcategoryRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/manufacter", manufacterRoute);
 app.use("/api/product", productRoute);
+app.use("/api/supplaier", supplaierRoute);
+app.use("/api/country", countryRoute);
+app.use("/api/city", cityRoute);
 
 // Port Configuration
 const PORT = 5000;

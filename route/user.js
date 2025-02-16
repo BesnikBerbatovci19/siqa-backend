@@ -21,7 +21,7 @@ router.post(
   UserController.createUser
 );
 router.put(
-  "/update/:id",
+  "/:id",
   authMiddleware,
   checkRole("admin"),
   UserController.updateUser

@@ -2,6 +2,7 @@ const ProdctModel = require("../model/product.model");
 const { v4: uuidv4 } = require("uuid");
 const { generateSlugSubCategoryByName } = require("../utils/generateSlug");
 const { validationAddProductInput } = require("../validation/product/product");
+const path = require("path");
 exports.getProduct = async function (req, res) {
   try {
     const result = await ProdctModel.getAllProduct();
@@ -25,6 +26,7 @@ exports.getProductById = async function (req, res) {
 
 exports.createProduct = async function (req, res) {
   const paths = req.files.map((file) => ({ id: uuidv4(), path: file.path }));
+
   const { errors, isValid } = validationAddProductInput(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
@@ -82,7 +84,31 @@ exports.createProduct = async function (req, res) {
 
 exports.updateProduct = async function (req, res) {
   const { id } = req.params;
-  console.log(req.body);
+  const paths =
+    req.files != undefined
+      ? req.files.length > 0
+        ? req.files.map((file) => ({
+            id: uuidv4(),
+            path: `uploads\\product\\${path.basename(file.path)}`,
+          }))
+        : null
+      : null;
+  try {
+    ProdctModel.update(id, req.body, paths)
+      .then(() => {
+        res.json({
+          success: true,
+          message: "Product updated successfull",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({ message: "Error updated product" });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, msg: "Interna Server Error" });
+  }
 };
 
 exports.deleteProduct = async function (req, res) {
