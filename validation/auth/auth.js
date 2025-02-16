@@ -86,10 +86,6 @@ function validtionUpdateInput(data) {
     errors.surname = "Surname field is required";
   }
 
-  if (!Validator.isLength(data.phone, { min: 6, max: 12 })) {
-    errors.phone = "Phone number must be between 6 and 12 characters";
-  }
-
   if (Validator.isEmpty(data.phone)) {
     errors.phone = "Phone field is required";
   }

@@ -59,7 +59,6 @@ exports.createUser = async function (req, res) {
 };
 exports.updateUser = async function (req, res) {
   const { id } = req.params;
-
   const { errors, isValid } = validtionUpdateInput(req.body);
 
   if (!isValid) {
