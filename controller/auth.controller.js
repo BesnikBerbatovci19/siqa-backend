@@ -2,6 +2,7 @@ const UserModel = require("../model/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -37,6 +38,24 @@ exports.login = async (req, res) => {
 
       res.json({ token });
     });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, msg: "Interna Server Error" });
+  }
+};
+
+exports.getUserByJwt = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    UserModel.getUserById(id)
+      .then((user) => {
+        res.json(user);
+      })
+      .catch((error) => {
+        console.error("Error get user:", error);
+        res.status(500).json({ message: "Error get user" });
+      });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, msg: "Interna Server Error" });

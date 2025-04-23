@@ -4,6 +4,7 @@ const router = express.Router();
 const ManufacterController = require("../controller/manufacter.controller");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 router.get("/getManufacter", ManufacterController.getAllManufacter);
+router.get("/getManufacter/:id", ManufacterController.getAllManufacterById);
 router.post(
   "/createManufacter",
   authMiddleware,

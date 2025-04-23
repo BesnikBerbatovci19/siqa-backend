@@ -13,6 +13,18 @@ exports.getAllManufacter = async (req, res) => {
   }
 };
 
+exports.getAllManufacterById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await ManufacterModel.getAllManufacterById(id);
+    return res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error fetching manufacter", error });
+  }
+};
 exports.createManufacter = async (req, res) => {
   const { catId, name } = req.body;
   if (!catId || !name) {

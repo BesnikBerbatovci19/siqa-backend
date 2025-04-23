@@ -14,6 +14,7 @@ exports.getItemSubcategory = async function (req, res) {
 
 exports.getItemSubcategoryById = async function (req, res) {
   const { id } = req.params;
+  console.log(id);
   try {
     const response = await ItemSubCategoryModel.getAllItemSubcategoryById(id);
     return res.status(200).json(response);
