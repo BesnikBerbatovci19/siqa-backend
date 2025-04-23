@@ -4,12 +4,33 @@ const router = express.Router();
 const ProductController = require("../controller/product.controller");
 const uploadMiddleware = require("../middleware/upload/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
+
+router.get("/", ProductController.getProduct);
+
+router.get("/searchLiveProduct", ProductController.searchProduct);
+
 router.get(
-  "/",
-  authMiddleware,
-  checkRole("admin"),
-  ProductController.getProduct
+  "/getSearchSubCategoryProduct/:slug",
+  ProductController.getSearchSubCategoryProduct
 );
+
+router.get("/getSearchProduct/:slug", ProductController.getSearchProduct);
+
+router.get(
+  "/getSearchItemProduct/:slug",
+  ProductController.getSearchItemProduct
+);
+
+router.get(
+  "/getSearchProductByName/:name",
+  ProductController.getSearchProductByName
+);
+
+router.get(
+  "/getProductByBarcode/:barcode",
+  ProductController.getProductByBarcode
+);
+
 router.get(
   "/:id",
   authMiddleware,

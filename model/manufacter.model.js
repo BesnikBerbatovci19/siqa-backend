@@ -9,6 +9,15 @@ const getAllManufacter = async () => {
   return result.data;
 };
 
+const getAllManufacterById = async (id) => {
+  const result = await executeQuery({
+    query: getSQLQuery([1025]),
+    params: [id],
+  });
+  if (!result?.status) throw result;
+  return result.data;
+};
+
 const createManufacter = async (catId, name, slug) => {
   const result = await executeQuery({
     query: getSQLQuery([2004]),
@@ -31,4 +40,5 @@ module.exports = {
   getAllManufacter,
   createManufacter,
   deleteManufacter,
+  getAllManufacterById,
 };

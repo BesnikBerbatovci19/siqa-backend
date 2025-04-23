@@ -16,6 +16,9 @@ const productRoute = require("./route/product");
 const supplaierRoute = require("./route/supplaierRoute");
 const countryRoute = require("./route/countryRoute");
 const cityRoute = require("./route/cityRoute");
+const bannerRoute = require("./route/bannerRoute");
+const wishListRoute = require("./route/wishlistRoute");
+const websiteRoute = require("./route/websiteRoute");
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
@@ -55,7 +58,9 @@ app.use("/api/product", productRoute);
 app.use("/api/supplaier", supplaierRoute);
 app.use("/api/country", countryRoute);
 app.use("/api/city", cityRoute);
-
+app.use("/api/banner", bannerRoute);
+app.use("/api/wishlist", wishListRoute);
+app.use("/api/website", websiteRoute);
 // Port Configuration
 const PORT = 5000;
 

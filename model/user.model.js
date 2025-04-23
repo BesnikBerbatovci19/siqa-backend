@@ -27,7 +27,7 @@ const getUserById = async (id) => {
   });
 
   if (!result?.status) throw result;
-  return result?.data;
+  return result?.data[0];
 };
 
 const createUser = async ({ name, surname, email, phone, password, role }) => {

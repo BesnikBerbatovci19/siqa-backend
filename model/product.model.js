@@ -2,9 +2,10 @@ const { executeQuery } = require("../config/database");
 const { getSQLQuery } = require("../lib/getSQLQuery");
 const { toNullIfEmpty } = require("../utils/convertTypeData");
 
-const getAllProduct = async () => {
+const getAllProduct = async (limit) => {
   const result = await executeQuery({
     query: getSQLQuery([1013]),
+    params: [parseInt(limit)],
   });
   if (!result?.status) throw result;
   return result?.data;
@@ -220,6 +221,312 @@ const update = async (id, data, paths) => {
   return result?.data;
 };
 
+const getAllByCategory = async (slug, query) => {
+  const data = JSON.parse(query?.filters);
+  let baseQuery = `FROM product WHERE category_slug = ?`;
+  const queryParams = [slug];
+
+  if (data.inStock !== undefined) {
+    baseQuery += ` AND inStock = ?`;
+    queryParams.push(data.inStock);
+  }
+
+  if (data.offers === true) {
+    baseQuery += ` AND discount IS NOT NULL`;
+  }
+
+  if (data.arrivalTime === true) {
+    baseQuery += ` AND status = 1`;
+  }
+  if (data.st === 1) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 30 DAY`;
+  } else if (data.st === 1.4) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 90 DAY`;
+  }
+
+  if (
+    data.min !== undefined &&
+    data.min !== "" &&
+    data.max !== undefined &&
+    data.max !== ""
+  ) {
+    baseQuery += ` AND price BETWEEN ? AND ?`;
+    queryParams.push(data.min, data.max);
+  } else if (data.min !== undefined && data.min !== "") {
+    baseQuery += ` AND price >= ?`;
+    queryParams.push(data.min);
+  } else if (data.max !== undefined && data.max !== "") {
+    baseQuery += ` AND price <= ?`;
+    queryParams.push(data.max);
+  }
+
+  if (data.removeSold === true) {
+    baseQuery += ` AND inStock > 0`;
+  }
+
+  if (data.manufacter && data.manufacter.length > 0) {
+    const placeholders = data.manufacter.map(() => "?").join(",");
+    baseQuery += ` AND manufacter_id IN (${placeholders})`;
+    queryParams.push(...data.manufacter);
+  }
+  let orderByClause = `ORDER BY inStock DESC, id DESC`;
+
+  const countQuery = `SELECT COUNT(*) AS total ${baseQuery}`;
+
+  const limit = parseInt(data.limit, 10) || 10;
+  const page = parseInt(data.page, 10) || 1;
+  const offset = (page - 1) * limit;
+  const fetchQuery = `SELECT * ${baseQuery} ${orderByClause} LIMIT ? OFFSET ?`;
+  const fetchQueryParams = [...queryParams, limit, offset];
+
+  const response = await executeQuery({
+    query: fetchQuery,
+    params: fetchQueryParams,
+  });
+  const total = await executeQuery({
+    query: countQuery,
+    params: queryParams,
+  });
+  return {
+    total: total.data[0].total,
+    products: response.data,
+  };
+};
+
+const getSearchSubCategoryProduct = async (slug, query) => {
+  const data = JSON.parse(query?.filters || "{}");
+  let baseQuery = `FROM product WHERE subcategory_slug = ?`;
+  const queryParams = [slug];
+
+  if (data.inStock !== undefined) {
+    baseQuery += ` AND inStock = ?`;
+    queryParams.push(data.inStock);
+  }
+
+  if (data.offers === true) {
+    baseQuery += ` AND discount IS NOT NULL`;
+  }
+
+  if (data.arrivalTime === true) {
+    baseQuery += ` AND status = 1`;
+  }
+  if (data.st === 1) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 30 DAY`;
+  } else if (data.st === 1.4) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 90 DAY`;
+  }
+
+  if (
+    data.min !== undefined &&
+    data.min !== "" &&
+    data.max !== undefined &&
+    data.max !== ""
+  ) {
+    baseQuery += ` AND price BETWEEN ? AND ?`;
+    queryParams.push(data.min, data.max);
+  } else if (data.min !== undefined && data.min !== "") {
+    baseQuery += ` AND price >= ?`;
+    queryParams.push(data.min);
+  } else if (data.max !== undefined && data.max !== "") {
+    baseQuery += ` AND price <= ?`;
+    queryParams.push(data.max);
+  }
+
+  if (data.removeSold === true) {
+    baseQuery += ` AND inStock > 0`;
+  }
+
+  if (data.manufacter && data.manufacter.length > 0) {
+    const placeholders = data.manufacter.map(() => "?").join(",");
+    baseQuery += ` AND manufacter_id IN (${placeholders})`;
+    queryParams.push(...data.manufacter);
+  }
+  let orderByClause = `ORDER BY inStock DESC, id DESC`;
+
+  const countQuery = `SELECT COUNT(*) AS total ${baseQuery}`;
+
+  const limit = parseInt(data.limit, 10) || 10;
+  const page = parseInt(data.page, 10) || 1;
+  const offset = (page - 1) * limit;
+  const fetchQuery = `SELECT * ${baseQuery} ${orderByClause} LIMIT ? OFFSET ?`;
+  const fetchQueryParams = [...queryParams, limit, offset];
+
+  const response = await executeQuery({
+    query: fetchQuery,
+    params: fetchQueryParams,
+  });
+  const total = await executeQuery({
+    query: countQuery,
+    params: queryParams,
+  });
+  return {
+    total: total.data[0].total,
+    products: response.data,
+  };
+};
+
+const getSearchItemProduct = async (slug, query) => {
+  const data = JSON.parse(query?.filters || "{}");
+  let baseQuery = `FROM product WHERE itemsubcategory_slug = ?`;
+  const queryParams = [slug];
+
+  if (data.inStock !== undefined) {
+    baseQuery += ` AND inStock = ?`;
+    queryParams.push(data.inStock);
+  }
+
+  if (data.offers === true) {
+    baseQuery += ` AND discount IS NOT NULL`;
+  }
+
+  if (data.arrivalTime === true) {
+    baseQuery += ` AND status = 1`;
+  }
+  if (data.st === 1) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 30 DAY`;
+  } else if (data.st === 1.4) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 90 DAY`;
+  }
+
+  if (
+    data.min !== undefined &&
+    data.min !== "" &&
+    data.max !== undefined &&
+    data.max !== ""
+  ) {
+    baseQuery += ` AND price BETWEEN ? AND ?`;
+    queryParams.push(data.min, data.max);
+  } else if (data.min !== undefined && data.min !== "") {
+    baseQuery += ` AND price >= ?`;
+    queryParams.push(data.min);
+  } else if (data.max !== undefined && data.max !== "") {
+    baseQuery += ` AND price <= ?`;
+    queryParams.push(data.max);
+  }
+
+  if (data.removeSold === true) {
+    baseQuery += ` AND inStock > 0`;
+  }
+
+  if (data.manufacter && data.manufacter.length > 0) {
+    const placeholders = data.manufacter.map(() => "?").join(",");
+    baseQuery += ` AND manufacter_id IN (${placeholders})`;
+    queryParams.push(...data.manufacter);
+  }
+  let orderByClause = `ORDER BY inStock DESC, id DESC`;
+
+  const countQuery = `SELECT COUNT(*) AS total ${baseQuery}`;
+
+  const limit = parseInt(data.limit, 10) || 10;
+  const page = parseInt(data.page, 10) || 1;
+  const offset = (page - 1) * limit;
+  const fetchQuery = `SELECT * ${baseQuery} ${orderByClause} LIMIT ? OFFSET ?`;
+  const fetchQueryParams = [...queryParams, limit, offset];
+
+  const response = await executeQuery({
+    query: fetchQuery,
+    params: fetchQueryParams,
+  });
+  const total = await executeQuery({
+    query: countQuery,
+    params: queryParams,
+  });
+  return {
+    total: total.data[0].total,
+    products: response.data,
+  };
+};
+
+const getProductByBarcode = async (barcode) => {
+  const result = await executeQuery({
+    query: getSQLQuery([1026]),
+    params: [barcode],
+  });
+  if (!result?.status) throw result;
+  return result?.data;
+};
+
+const searchProduct = async (search) => {
+  const result = await executeQuery({
+    query: getSQLQuery([1029]),
+    params: [`%${search.trim()}%`],
+  });
+  if (!result?.status) throw result;
+  return result?.data;
+};
+
+const getSearchProductByName = async (slug, query) => {
+  const data = JSON.parse(query?.filters || "{}");
+  let baseQuery = `FROM product WHERE name LIKE ?`;
+  const queryParams = [`%${slug}%`];
+
+  if (data.inStock !== undefined) {
+    baseQuery += ` AND inStock = ?`;
+    queryParams.push(data.inStock);
+  }
+
+  if (data.offers === true) {
+    baseQuery += ` AND discount IS NOT NULL`;
+  }
+
+  if (data.arrivalTime === true) {
+    baseQuery += ` AND status = 1`;
+  }
+  if (data.st === 1) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 30 DAY`;
+  } else if (data.st === 1.4) {
+    baseQuery += ` AND created_at >= NOW() - INTERVAL 90 DAY`;
+  }
+
+  if (
+    data.min !== undefined &&
+    data.min !== "" &&
+    data.max !== undefined &&
+    data.max !== ""
+  ) {
+    baseQuery += ` AND price BETWEEN ? AND ?`;
+    queryParams.push(data.min, data.max);
+  } else if (data.min !== undefined && data.min !== "") {
+    baseQuery += ` AND price >= ?`;
+    queryParams.push(data.min);
+  } else if (data.max !== undefined && data.max !== "") {
+    baseQuery += ` AND price <= ?`;
+    queryParams.push(data.max);
+  }
+
+  if (data.removeSold === true) {
+    baseQuery += ` AND inStock > 0`;
+  }
+
+  if (data.manufacter && data.manufacter.length > 0) {
+    const placeholders = data.manufacter.map(() => "?").join(",");
+    baseQuery += ` AND manufacter_id IN (${placeholders})`;
+    queryParams.push(...data.manufacter);
+  }
+  let orderByClause = `ORDER BY inStock DESC, id DESC`;
+
+  const countQuery = `SELECT COUNT(*) AS total ${baseQuery}`;
+
+  const limit = parseInt(data.limit, 10) || 10;
+  const page = parseInt(data.page, 10) || 1;
+  const offset = (page - 1) * limit;
+  const fetchQuery = `SELECT * ${baseQuery} ${orderByClause} LIMIT ? OFFSET ?`;
+  const fetchQueryParams = [...queryParams, limit, offset];
+
+  const response = await executeQuery({
+    query: fetchQuery,
+    params: fetchQueryParams,
+  });
+  const total = await executeQuery({
+    query: countQuery,
+    params: queryParams,
+  });
+  return {
+    total: total.data[0].total,
+    products: response.data,
+  };
+};
+
 module.exports = {
   getAllProduct,
   getProductById,
@@ -227,4 +534,10 @@ module.exports = {
   deleteProduct,
   deletePhoto,
   update,
+  getAllByCategory,
+  getSearchSubCategoryProduct,
+  getSearchItemProduct,
+  getProductByBarcode,
+  searchProduct,
+  getSearchProductByName,
 };

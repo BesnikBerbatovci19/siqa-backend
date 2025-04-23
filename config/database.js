@@ -24,7 +24,6 @@ const dbCon = async ({ query, params }) => {
 };
 
 const getDbConnection = async () => {
-  // Check if db is already connected
   if (dbConnection) return dbConnection;
 
   return new Promise((resolve, reject) => {
@@ -32,11 +31,11 @@ const getDbConnection = async () => {
     db.connect((err) => {
       if (err) {
         console.error("Database connection failed: ", err);
-        return reject(err); // Return rejection if there is an error
+        return reject(err);
       }
       console.log("Connected to Main database");
       dbConnection = db;
-      resolve(db); // Resolve the connection
+      resolve(db);
     });
   });
 };

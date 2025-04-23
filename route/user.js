@@ -14,12 +14,7 @@ router.get(
   checkRole("admin"),
   UserController.getUserById
 );
-router.post(
-  "/createUser",
-  authMiddleware,
-  checkRole("admin"),
-  UserController.createUser
-);
+router.post("/createUser", UserController.createUser);
 router.put(
   "/:id",
   authMiddleware,

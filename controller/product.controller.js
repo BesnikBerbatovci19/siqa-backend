@@ -1,11 +1,12 @@
-const ProdctModel = require("../model/product.model");
+const ProductModel = require("../model/product.model");
 const { v4: uuidv4 } = require("uuid");
 const { generateSlugSubCategoryByName } = require("../utils/generateSlug");
 const { validationAddProductInput } = require("../validation/product/product");
 const path = require("path");
 exports.getProduct = async function (req, res) {
+  const limit = req.query.limit;
   try {
-    const result = await ProdctModel.getAllProduct();
+    const result = await ProductModel.getAllProduct(limit);
     return res.status(200).json(result);
   } catch (error) {
     console.log(error);
@@ -16,7 +17,7 @@ exports.getProduct = async function (req, res) {
 exports.getProductById = async function (req, res) {
   const { id } = req.params;
   try {
-    const result = await ProdctModel.getProductById(id);
+    const result = await ProductModel.getProductById(id);
     return res.status(200).json(result);
   } catch (error) {
     console.log(error);
@@ -53,7 +54,7 @@ exports.createProduct = async function (req, res) {
 
   const slug = generateSlugSubCategoryByName(name);
   try {
-    const result = await ProdctModel.createProduct(
+    const result = await ProductModel.createProduct(
       null,
       category_id,
       category_slug,
@@ -94,7 +95,7 @@ exports.updateProduct = async function (req, res) {
         : null
       : null;
   try {
-    ProdctModel.update(id, req.body, paths)
+    ProductModel.update(id, req.body, paths)
       .then(() => {
         res.json({
           success: true,
@@ -115,7 +116,7 @@ exports.deleteProduct = async function (req, res) {
   const { id } = req.params;
 
   try {
-    const result = await ProdctModel.deleteProduct(id);
+    const result = await ProductModel.deleteProduct(id);
     return res.json({ message: "Produkti u fshi me sukses" });
   } catch (error) {
     console.log(error);
@@ -126,7 +127,7 @@ exports.deleteProduct = async function (req, res) {
 exports.deletePhoto = async function (req, res) {
   try {
     const { id, idPhoto } = req.params;
-    ProdctModel.deletePhoto(id, idPhoto)
+    ProductModel.deletePhoto(id, idPhoto)
       .then(() => {
         res.json({
           success: true,
@@ -140,5 +141,87 @@ exports.deletePhoto = async function (req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, msg: "Interna Server Error" });
+  }
+};
+
+exports.getSearchProduct = async function (req, res) {
+  try {
+    const { slug } = req.params;
+    const queryParams = req.query;
+    const { total, products } = await ProductModel.getAllByCategory(
+      slug,
+      queryParams
+    );
+    res.json({ total, products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, mesg: "Interna server error" });
+  }
+};
+
+exports.getSearchSubCategoryProduct = async function (req, res) {
+  try {
+    const { slug } = req.params;
+    const queryParams = req.query;
+    const { total, products } = await ProductModel.getSearchSubCategoryProduct(
+      slug,
+      queryParams
+    );
+    res.json({ total, products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, mesg: "Interna server error" });
+  }
+};
+
+exports.getSearchItemProduct = async function (req, res) {
+  try {
+    const { slug } = req.params;
+    const queryParams = req.query;
+    const { total, products } = await ProductModel.getSearchItemProduct(
+      slug,
+      queryParams
+    );
+    res.json({ total, products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, mesg: "Interna server error" });
+  }
+};
+
+exports.getProductByBarcode = async function (req, res) {
+  const { barcode } = req.params;
+  try {
+    const result = await ProductModel.getProductByBarcode(barcode);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, msg: "Interna server error" });
+  }
+};
+
+exports.searchProduct = async function (req, res) {
+  try {
+    const search = req.query.q || "";
+    const result = await ProductModel.searchProduct(search);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, msg: "Interna server error" });
+  }
+};
+
+exports.getSearchProductByName = async function (req, res) {
+  try {
+    const { name } = req.params;
+    const queryParams = req.query;
+    const { total, products } = await ProductModel.getSearchProductByName(
+      name,
+      queryParams
+    );
+    res.json({ total, products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, mesg: "Interna server error" });
   }
 };
