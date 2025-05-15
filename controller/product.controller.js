@@ -4,7 +4,7 @@ const { generateSlugSubCategoryByName } = require("../utils/generateSlug");
 const { validationAddProductInput } = require("../validation/product/product");
 const path = require("path");
 exports.getProduct = async function (req, res) {
-  const limit = req.query.limit;
+  const limit = req.query.limit || 0;
   try {
     const result = await ProductModel.getAllProduct(limit);
     return res.status(200).json(result);

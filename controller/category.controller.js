@@ -27,9 +27,14 @@ exports.createCategory = async (req, res) => {
       .json({ message: "Emri dhe pershkrimi duhet te plotsohen" });
   }
   const existingCategory = await CategoryModel.getAllCategory();
-  const existingOrders = existingCategory.map((item) => item.order);
+
+  const existingOrders = existingCategory[0]?.categories.map(
+    (item) => item.order
+  );
+
   const nextOrder =
     existingOrders.length > 0 ? Math.max(...existingOrders) + 1 : 1;
+
   try {
     const category = await CategoryModel.createCategory(
       name,
