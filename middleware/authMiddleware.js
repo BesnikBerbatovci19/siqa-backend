@@ -17,7 +17,7 @@ function authMiddleware(req, res, next) {
 
 function checkRole(...roles) {
   return (req, res, next) => {
-    const userRoles = req.user[0].role;
+    const userRoles = req.user.role || req.user[0].role;
     const hasRole = roles.some((role) => userRoles.includes(role));
 
     if (!hasRole) {
