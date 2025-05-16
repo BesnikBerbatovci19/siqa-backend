@@ -27,8 +27,6 @@ const upload = multer({
 
 const uploadMiddleware = (req, res, next) => {
   upload.array("files", 15)(req, res, async (err) => {
-    console.log("req", req.files);
-    console.log("err", err);
     if (err) {
       return res.status(400).json({ error: err.message });
     }
