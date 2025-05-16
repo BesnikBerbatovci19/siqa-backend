@@ -16,8 +16,8 @@ exports.createBanner = async function (req, res) {
   if (!files || !files.photo_md || !files.photo_sm) {
     return res.status(400).json({ message: "Please upload both banners" });
   }
-  const photo_md = files.photo_md[0].path;
-  const photo_sm = files.photo_sm[0].path;
+  const photo_md = files.photo_md[0].key;
+  const photo_sm = files.photo_sm[0].key;
 
   const existingBanners = await BannerModel.getAllBanner();
   const existingOrders = existingBanners.map((item) => item.order);

@@ -1,22 +1,29 @@
 const multer = require("multer");
-const fs = require("fs");
+const multerS3 = require("multer-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+require("dotenv").config();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = "uploads/banner";
-
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+const s3 = new S3Client({
+  region: process.env.SPACES_REGION,
+  endpoint: process.env.SPACES_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.SPACES_ACCESS_KEY,
+    secretAccessKey: process.env.SPACES_SECRET_KEY,
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.SPACES_BUCKET,
+    acl: "public-read",
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      cb(null, `uploads/banner/${Date.now()}-${file.originalname}`);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 const uploadMiddlewareBanner = (req, res, next) => {
   upload.fields([
@@ -26,6 +33,7 @@ const uploadMiddlewareBanner = (req, res, next) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
+
     const allowedTypes = [
       "image/jpeg",
       "image/png",
@@ -40,19 +48,29 @@ const uploadMiddlewareBanner = (req, res, next) => {
       return res.status(400).json({ error: "Please upload both banners" });
     }
 
+    const uploadedFiles = {};
+    const errors = [];
+
     for (const key of ["photo_md", "photo_sm"]) {
       if (files[key] && files[key][0]) {
         const file = files[key][0];
-
         if (!allowedTypes.includes(file.mimetype)) {
-          fs.unlinkSync(file.path);
-          return res
-            .status(400)
-            .json({ error: `Invalid file type: ${file.originalname}` });
+          errors.push(`Invalid file type: ${file.originalname}`);
+        } else {
+          uploadedFiles[key] = {
+            originalName: file.originalname,
+            fileName: file.key,
+            url: file.location,
+          };
         }
       }
     }
 
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+
+    req.uploadedFiles = uploadedFiles;
     next();
   });
 };

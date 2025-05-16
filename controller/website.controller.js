@@ -13,7 +13,7 @@ exports.getAllWebsite = async (req, res) => {
 exports.createWebsite = async (req, res) => {
   try {
     const { name, url } = req.body;
-    const logo = req.file.path;
+    const logo = req.file.key;
     const result = await WebsiteModel.createWebsite(name, logo, url);
     return res.status(200).json(result);
   } catch (error) {
