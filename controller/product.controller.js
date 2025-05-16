@@ -4,7 +4,7 @@ const { generateSlugSubCategoryByName } = require("../utils/generateSlug");
 const { validationAddProductInput } = require("../validation/product/product");
 const path = require("path");
 exports.getProduct = async function (req, res) {
-  const limit = req.query.limit || 0;
+  const limit = req.query.limit || 25;
   try {
     const result = await ProductModel.getAllProduct(limit);
     return res.status(200).json(result);
@@ -26,7 +26,7 @@ exports.getProductById = async function (req, res) {
 };
 
 exports.createProduct = async function (req, res) {
-  const paths = req.files.map((file) => ({ id: uuidv4(), path: file.path }));
+  const paths = req.files.map((file) => ({ id: uuidv4(), path: file.key }));
 
   const { errors, isValid } = validationAddProductInput(req.body);
   if (!isValid) {
