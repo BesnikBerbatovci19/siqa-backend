@@ -22,7 +22,6 @@ exports.login = async (req, res) => {
           message: "Email-i ose fjalkalimi janë gabimë!",
         });
       }
-
       const token = jwt.sign(
         {
           id: user.id,
