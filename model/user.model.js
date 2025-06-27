@@ -77,6 +77,42 @@ const updateUser = async (id, userData) => {
   return result.data;
 };
 
+const updateGuestUser = async (id, userData) => {
+  let query = `
+    UPDATE users
+    SET 
+      name = ?,
+      surname = ?,
+      email = ?,
+      phone = ?,
+      address = ?
+  `;
+  const params = [
+    userData?.name ?? null,
+    userData?.surname ?? null,
+    userData?.email ?? null,
+    userData?.phone ?? null,
+    userData?.address ?? null,
+  ];
+
+  if (userData?.password) {
+    const hashPassword = bcrypt.hashSync(userData?.password, 10);
+    query += ", password = ?";
+    params.push(hashPassword);
+  }
+
+  query += " WHERE id = ?";
+  params.push(id);
+
+  const result = await executeQuery({
+    query,
+    params,
+  });
+
+  if (!result?.status) throw result;
+  return result.data;
+};
+
 const deleteUser = async (id) => {
   const result = await executeQuery({
     query: getSQLQuery([4000]),
@@ -93,4 +129,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserByEmail,
+  updateGuestUser,
 };

@@ -28,9 +28,9 @@ exports.createCategory = async (req, res) => {
   }
   const existingCategory = await CategoryModel.getAllCategory();
 
-  const existingOrders = existingCategory[0]?.categories.map(
-    (item) => item.order
-  );
+  const existingOrders = existingCategory[0]?.categories
+    ? existingCategory[0]?.categories.map((item) => item.order)
+    : 0;
 
   const nextOrder =
     existingOrders.length > 0 ? Math.max(...existingOrders) + 1 : 1;

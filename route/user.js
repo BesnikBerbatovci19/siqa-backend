@@ -14,6 +14,12 @@ router.get(
   checkRole("admin"),
   UserController.getUserById
 );
+router.post(
+  "/updateUser",
+  authMiddleware,
+  checkRole("guest"),
+  UserController.updateGuestUser
+);
 router.post("/createUser", UserController.createUser);
 router.put(
   "/:id",

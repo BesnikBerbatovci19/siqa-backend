@@ -77,6 +77,7 @@ exports.updateUser = async function (req, res) {
     return res.status(500).json({ message: "Error updating user", error });
   }
 };
+
 exports.deleteUser = async function (req, res) {
   const { id } = req.params;
   try {
@@ -88,5 +89,34 @@ exports.deleteUser = async function (req, res) {
     }
   } catch (error) {
     return res.status(500).json({ message: "Error deleting user", error });
+  }
+};
+
+exports.updateGuestUser = async function (req, res) {
+  const { id: userId } = req.user;
+  const { email } = req.body;
+  if (email) {
+    const existingUser = await UserModel.getUserByEmail({ email });
+
+    if (existingUser?.length > 0 && existingUser[0].id !== userId) {
+      return res.status(400).json({ message: "Ky email është i zënë." });
+    }
+  }
+
+  try {
+    const updateUser = await UserModel.updateGuestUser(userId, req.body);
+
+    if (updateUser.affectedRows > 0) {
+      return res
+        .status(200)
+        .json({ message: "Informatat u përditësuan me sukses" });
+    } else {
+      return res.status(404).json({
+        message: "Përdoruesi nuk u gjet ose të dhënat janë të njëjta",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error updating guest user".error });
   }
 };
